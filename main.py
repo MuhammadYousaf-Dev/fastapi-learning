@@ -153,23 +153,23 @@ def update_user(
                 status_code=status.HTTP_400_BAD_REQUEST,
                 detail="Username already exists",
             )
-        if user_update.email is not None and user_update.email != user.email:
-            result = db.execute(
-                select(models.User).where(models.User.email == user_update.email),
+    if user_update.email is not None and user_update.email != user.email:
+        result = db.execute(
+            select(models.User).where(models.User.email == user_update.email),
+        )
+        existing_email = result.scalars().first()
+        if existing_email:
+            raise HTTPException(
+                status_code=status.HTTP_400_BAD_REQUEST,
+                detail="Email already registered",
             )
-            existing_email = result.scalars().first()
-            if existing_email:
-                raise HTTPException(
-                    status_code=status.HTTP_400_BAD_REQUEST,
-                    detail="Email already registered",
-                )
 
-        if user_update.username is not None:
-            user.username = user_update.username
-        if user_update.email is not None:
-            user.email = user_update.email
-        if user_update.image_file is not None:
-            user.image_file = user_update.image_file
+    if user_update.username is not None:
+        user.username = user_update.username
+    if user_update.email is not None:
+        user.email = user_update.email
+    if user_update.image_file is not None:
+        user.image_file = user_update.image_file
 
     db.commit()
     db.refresh(user)
